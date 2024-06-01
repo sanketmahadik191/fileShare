@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload and Management</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+section {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 400px;
+}
+
+form, input, button {
+  display: block;
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#uploadResult, #linkResult, #emailResult {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+  </style>
+</head>
+<body>
+  <h1>File Upload and Management</h1>
+
+  <div class="upload-section">
+    <h2>Upload File</h2>
+    <form id="uploadForm">
+      <input type="file" id="fileInput" name="file" required>
+      <button type="submit">Upload</button>
+    </form>
+    <div id="uploadResult"></div>
+  </div>
+
+  <div class="link-section">
+    <h2>Generate Dynamic Link</h2>
+    <input type="text" id="uuidInput" placeholder="Enter file UUID" required>
+    <button id="generateLinkButton">Generate Link</button>
+    <div id="linkResult"></div>
+  </div>
+
+  <div class="download-section">
+    <h2>Download File</h2>
+    <input type="text" id="downloadUuidInput" placeholder="Enter file UUID" required>
+    <button id="downloadButton">Download</button>
+  </div>
+
+  <div class="email-section">
+    <h2>Send File via Email</h2>
+    <input type="text" id="emailUuidInput" placeholder="Enter file UUID" required>
+    <input type="email" id="emailToInput" placeholder="Enter recipient's email" required>
+    <button id="sendEmailButton">Send Email</button>
+    <div id="emailResult"></div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const fileInput = document.getElementById('fileInput').files[0];
+  const formData = new FormData();
+  formData.append('file', fileInput);
+
+  try {
+    const response = await fetch('/api/files/', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await response.json();
+    document.getElementById('uploadResult').textContent = `File uploaded: ${result.fileInfo.originalFilename}`;
+  } catch (error) {
+    document.getElementById('uploadResult').textContent = 'Error uploading file';
+  }
+});
+
+document.getElementById('generateLinkButton').addEventListener('click', async function() {
+  const uuid = document.getElementById('uuidInput').value;
+  try {
+    const response = await fetch(`/files/${uuid}`);
+    const result = await response.json();
+    document.getElementById('linkResult').textContent = `Download link: ${result.file}`;
+  } catch (error) {
+    document.getElementById('linkResult').textContent = 'Error generating link';
+  }
+});
+
+document.getElementById('downloadButton').addEventListener('click', function() {
+  const uuid = document.getElementById('downloadUuidInput').value;
+  window.location.href = `/files/download/${uuid}`;
+});
+
+document.getElementById('sendEmailButton').addEventListener('click', async function() {
+  const uuid = document.getElementById('emailUuidInput').value;
+  const emailTo = document.getElementById('emailToInput').value;
+
+  try {
+    const response = await fetch('/api/files/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ uuid, emailTo })
+    });
+    const result = await response.text();
+    document.getElementById('emailResult').textContent = result;
+  } catch (error) {
+    document.getElementById('emailResult').textContent = 'Error sending email';
+  }
+});
+
+  </script>
+</body>
+</html>

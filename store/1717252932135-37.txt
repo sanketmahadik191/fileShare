@@ -1,0 +1,23 @@
+
+(web server)-- google drive
+1-user will upload file to our server
+2-genrate a sharabe link
+3-use link to dwonload file
+4-dowloaded link to email
+
+
+**API Endpoints:**
+1. **`POST http://localhost:8080/api/files/`**: Upload a file and dynamically generate a UUID.
+2. **`GET http://localhost:8080/files/:uuid`**: Get a dynamic download link for the file with the specified UUID.
+3. **`GET http://localhost:8080/files/download/:uuid`**: Download a file based on the dynamic UUID.
+4. **`POST http://localhost:8080/api/files/send`**: Send an email containing a dynamic download link.
+
+
+multer ----
+
+1- Create multer instance
+2- Create a configration object
+3- Attach the middleware to reaquired API or Module or App
+
+multer - package help you exract file and upload file
+configration - where to save , how many files to save , file size or extension
